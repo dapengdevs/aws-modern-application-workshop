@@ -6,113 +6,45 @@
 * General Purpose SSD, OS boot volume, database, max IOPS 10000
 * Provisioned IOPS SSD, large database, NoSQL, max IOPS 20000
 
-## S3
-* object storage
-* conssits of key, value, version ID, meta data and ACL
-* Size: 0 - 5 TB
-* S3 objects are replciated across multiple devices within a region
-* To avoid accidental deletion, enable versioning and MFA
-* Bucket name between 3 and 63 chars, can contain numbers, letters, hypen and period
-* Bucket name must start and end with lower case ltter or a number 3 and 63 chars, can contain numbers, letters, hypen and period
-* Conssitency
-  * Read after write consistency for PUTs to new object
-  * Eventual consistency for PUT/DELETE of existing object
-* S3 storage classes
-  * Standard: 99.99% availabiltiy, >=3 AZs
-  * Intelligent tiering: 99.9% availability, storage duration is unknown. AI monitors the usage and moves to different class upon usage, >=3 AZs
-  * Standard-IA: 99.9% availability, less frequnetly accessed data, min charge size: 128KB, >=3 AZs
-  * One Zone IA: 99.5% availability, less frequnetly accessed data that requires sudden access, min charge size: 128KB, =1 AZ
-  * Glacier: 99.9% availability, long-term archiving, no-upfront cost, cost based on GB, min charge size: 40KB, >=3 AZs.
-    * 3 access methods
-    * Expedited: retrieve data within 1 - 5 mins
-    * Standard: retrieve data within 3 - 5 hours
-    * Bulk: retrieve data within 5 - 12 hours
-  * GlacierDeep Archive: 99.9% availability, min charge size: 40KB, >=3 AZs. Retrieval in 12 hours
-* Typical worklaod: 100 requests per second
-* Introduce randomness into key naming to avoid partition congestion, so that obejcts are targetd at different partitions (parallel accesses)
-* For PUT, use multipart upload to improve performance
-* For GET, use range HTTP header to retrieve objects in multiple parts
-* It is hard to sort or manipulate contents of LIST. Build and maintain a secondary index outside of S3 (DynamoDB or RDS) to store, index and query objects metadata rather than performing operations on S3
-* S3 event notifications
- * SNS topic
- * SQS queue
- * Lambda
-* Can provide time-limited access
-* Additional features
- * transfer acceleration: speed up upload using cloud front in reverse
- * requester pays, not owner
- * static web hosting
- 
-## Bucket
-* flat container for objects
-* Doesn't provide hierarchy
-* 100 buckets per account
-* No nested buckets
-* Bucket name can't be changed
-* URL: https://s3-eu-west-1.amazonaws.com/bucketname
-* Can backup a bucket to another bucket in another account
-* Objects in a bucket never leave the region unless you move them or enable cross-region replication
-* sub resources
- * Lifecycle
- * Website
- * Versioning
- * ACL
- * Bucket policies
- * CORS
- * Logging
-* Access to S3
- * IAM policies
- * Bucket policies
- * ACL
- * Query string authentication (URL to S3 with a limited validity)
-* By default, all objects(and sub resources) are private. Only resource owner can access objects
-* ARN for S3: arn:aws:s3:region:namespace:bucket_name/key_name
-* A bucket owner can grant cross-account permissions to another AWS account to upload objects
- * Other AWS account that uploads the objects owns them
- * Bucket owner has no permissions on these objects
-  * He pays the cost
-  * Can deny access to any objects
-  * Can archive objects
-* ACL
- * can be assigned to owner, public access, a dedicated account(identified by email or canonical ID), log delivery group (for storing server logs)
- * Only recommended use case is to grant write access to S3 log delivery group
- * Limitations
-  * Can't grant access to individual users
-  * Can't grant conditional access
-  * Can't explicitly deny access
-* Bucket policy
- * Grant users permissions to a bucket
- * Managing object permissions
- * Granting object permissions to users within the account
-* For an IAM user to access resources in another account the following must be provided:
- * Permission from the parent account through a user policy
- * Permission from the resource owner to the IAM user through a bucket policy, or the parent account through a bucket policy, bucket ACL or object ACL
- 
-## Costs
-* No charge for data transfer between EC2 and S3 in the same region
-* Data transfer into S3 is free
-* Data transfer to other regions is charged
-* Data retrieval from IA is charged
-* Charge
- * per GB/month
- * Out of S3
- * Upload requests(PUT/GET)
- * Retrieval (IA & Glacier)
+## EFS
+* Pay for what you use (in contrast to EBS, pay for what you privison)
+* Multi-AZ metadata and storage
+* Can configure mount-points in one, or many, AZs
+* Can be mounted from on-premises systems ONLY if using Direct Connect or a VPN connection
+* Good for big data and analytics, media processing workflows, content management, web serving, home directories etc.
+* Can scale up to petabytes
+* EFS is elastic and grows and shrinks as you add and remove data
+* Can concurrently connect 1 to 1000s of EC2 instances, from multiple AZs
+* By default you can create up to 10 file systems per account
+* Can choose General Purpose or Max I/O (both SSD)
+* The VPC of the connecting instance must have DNS hostnames enabled
+* Data is stored across multiple AZ’s within a region
+* Read after write consistency
+* Need to create mount targets and choose AZ’s to include (recommended to include all AZ’s)
+* Limited region support currently
+* Using the EFS-to-EFS Backup solution, you can schedule automatic incremental backups of your Amazon EFS file system
+* A file system can be accessed concurrently from all AZs in the region where it is located
 
-## Transfer acceleration
-* leverages ClouFront's global edge locations
-* as secure as direct upload
-* must be enabled  on S3 bucket
-* Can't be disabled, only suspended
-* URL: bucketname.s3-accelerate.amazonaws.com
+## Access Control
+* When you create a file system, you create endpoints in your VPC called “mount targets”
+* When mounting from an EC2 instance, your file system’s DNS name, which you provide in your mount command, resolves to a mount target’s IP address
+* You can control who can administer your file system using IAM
+* You can control access to files and directories with POSIX-compliant user and group-level permissions
+* EFS Security Groups act as a firewall, and the rules you add define the traffic flow
 
-## Static websites
-* Can use custom domain name using Route 53 alias record
-* URL: bucketname.s3-website.amazonws.com
-* Doesn't support HTTPS
-* Only GET and HEAD requests
+##  Encryption
+* EFS offers the ability to encrypt data at rest and in transit
+* Encryption keys are managed by the AWS Key Management Service (KMS)
+* Data encryption in transit uses industry standard Transport Layer Security (TLS) 1.2
+* Enable encryption at rest in the EFS console or by using the AWS CLI or SDKs
 
-## Pre-signed URL
+## EFS File Sync
+* EFS File Sync provides a fast and simple way to securely sync existing file systems into Amazon EFS
+* EFS File Sync copies files and directories into Amazon EFS at speeds up to 5x faster than standard Linux copy tools, with simple setup and management in the AWS Console
+* EFS File Sync securely and efficiently copies files over the internet or an AWS Direct Connect connection
+* Copies file data and file system metadata such as ownership, timestamps, and access permissions 
 
- 
- 
+## Pricing and Billing
+* You pay only for the amount of file system storage you use per month
+* When using the Provisioned Throughput mode you pay for the throughput you provision per month
+* There is no minimum fee and there are no set-up charges
