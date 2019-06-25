@@ -1,7 +1,7 @@
 # Amazon Ec2
 
 ## General
-* Limit: 20 Do.Demand, 20 Reserved Instance
+* Limit: 20 On-Demand, 20 Reserved Instance
 * EC2 Compute Unit = ECU, relative measure of integer processing power of EC2 instance
 * For windows, private key file is required to obtain the password
 
@@ -21,6 +21,7 @@
   * One time request, data is ephemeral
   * Request and maintain, instance can terminate, stop, hibernate until price is met again
   * Can't use encrypted volumes
+  * EC2 isntance will receive notification on termination, termination in 2 minutes
 * Reserved
   * Provides a capacity reservation when used in a specific AZ
   * AWS Billing automatically applies discounted rates when you launch an instance that matches your purchased RI
@@ -46,13 +47,13 @@
   * physical servers dedicated just for you
   * Available as on-demand or with decdicated host reservation
   * Server-bound license
-  * Can run only one isntance size and type
+  * Can run only one instance size and type
   * Complete isolation
   * Expensive, billing per host
 * Dedicated instances
   * Virtualized instances on hardware just for you
   * Use physically dedicated servers
-  * Billnig per instance
+  * Billing per instance
   * May share hardware with other non-dedicated instances
   * Available as On-demand, RI and spot instances
   * Additional cost
@@ -80,6 +81,13 @@
   * Launch permissions
   * Block device mapping
 * AMIs are regional. You can copy AMI to other regions.
+
+## AMIs
+* 4 types
+ * published by AWS
+ * AWS Marketplace
+ * Existing instances's AMI
+ * Uplaoded AMIs (imported/exported via AWS Import/Export) 
 
 ## Networking
 * 5 elastic IPs per region
