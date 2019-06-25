@@ -38,11 +38,12 @@
 * Data encryption in transit uses industry standard Transport Layer Security (TLS) 1.2
 * Enable encryption at rest in the EFS console or by using the AWS CLI or SDKs
 
-## EFS File Sync
-* EFS File Sync provides a fast and simple way to securely sync existing file systems into Amazon EFS
+## EFS Data Sync
+* EFS File Sync provides a fast and simple way to securely sync existing file systems into Amazon EFS/S3
 * EFS File Sync copies files and directories into Amazon EFS at speeds up to 5x faster than standard Linux copy tools, with simple setup and management in the AWS Console
 * EFS File Sync securely and efficiently copies files over the internet or an AWS Direct Connect connection
 * Copies file data and file system metadata such as ownership, timestamps, and access permissions 
+* Run AWS DataSync Agent on on-prem system
 
 ## Pricing and Billing
 * You pay only for the amount of file system storage you use per month
