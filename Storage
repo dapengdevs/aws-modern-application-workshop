@@ -1,0 +1,10 @@
+# Storage
+
+## EBS
+* Cold HDD, application with few data access, max IOPS 250
+* Throughput HDD, data warehousing, log processing, max IOPS 500
+* General Purpose SSD, OS boot volume, database, max IOPS 10000
+* Provisioned IOPS SSD, large database, NoSQL, max IOPS 20000
+
+
+  
